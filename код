@@ -1,0 +1,46 @@
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+
+# Заранее созданные плейлисты
+MOOD_PLAYLISTS = {
+    "Весело": "https://open.spotify.com/playlist/1HappyPlaylist",
+    "Грустно": "https://open.spotify.com/playlist/2SadPlaylist",
+    "Устал": "https://open.spotify.com/playlist/3ChillPlaylist",
+    "Злой": "https://open.spotify.com/playlist/4AngryPlaylist"
+}
+
+# Клавиатура для выбора
+MOOD_KEYBOARD = [["Весело", "Грустно"], ["Устал", "Злой"]]
+
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Привет! Как ты себя чувствуешь?",
+        reply_markup=ReplyKeyboardMarkup(MOOD_KEYBOARD, one_time_keyboard=True, resize_keyboard=True)
+    )
+
+# Ответ на настроение
+async def mood_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    mood = update.message.text
+    playlist = MOOD_PLAYLISTS.get(mood)
+    
+    if playlist:
+        await update.message.reply_text(f"Вот треки для твоего настроения ({mood}):\n{playlist}")
+    else:
+        await update.message.reply_text("Выбери одно из предложенных настроений, бро!")
+
+# Точка входа
+if name == "main":
+    import asyncio
+    import os
+
+    # Сюда вставь токен, который дал BotFather
+    8433443222:AAHqu6s5LsoUrb8YDsGV1fDVj8Di4QvrDQo
+
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, mood_reply))
+
+    print("Бот запущен!")
+    app.run_polling()
